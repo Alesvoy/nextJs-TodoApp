@@ -29,6 +29,8 @@ const Form = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     createTodo(title, description);
+    setTitle("");
+    setDescription("");
   };
 
   return (

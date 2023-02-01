@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { groq } from "next-sanity";
-import Link from "next/link";
 import styled from "styled-components";
 
 import client from "../utils/sanityClient";
@@ -9,12 +8,20 @@ type Todo = {
   _id: string;
   title: string;
   description: string;
-  isCompleted: boolean;
+  isComplete: boolean;
 };
 
 const Main = styled.section`
   margin: 1.5rem;
 `;
+
+const handleClick = async (id: string) => {
+  try {
+    await client.delete(id);
+  } catch (error) {
+    console.error("Error: ", error);
+  }
+};
 
 const TodosList = () => {
   const query = groq`*[_type == "todo"]{
@@ -35,7 +42,8 @@ const TodosList = () => {
         <div key={todo._id}>
           <h3>{todo.title}</h3>
           <p>{todo.description}</p>
-          <p>{todo.isCompleted ? "Complete" : "Not Complete"}</p>
+          <p>{todo.isComplete ? "Complete" : "Not Complete"}</p>
+          <button onClick={() => handleClick(todo._id)}>Delete</button>
         </div>
       ))}
     </Main>
