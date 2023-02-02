@@ -1,6 +1,6 @@
 import Form from "../components/Form";
 
-export default function addTodo() {
+export default function AddTodo() {
   return (
     <>
       <Form />
