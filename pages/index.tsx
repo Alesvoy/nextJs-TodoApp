@@ -4,10 +4,27 @@ import { groq } from "next-sanity";
 import TodosList from "../components/TodosList";
 import client from "../utils/sanityClient";
 
-export default function Home({ todos }) {
+type Todo = {
+  _id: string;
+  title: string;
+  description: string;
+  isComplete: boolean;
+};
+
+type AppProps = {
+  todos: Todo[];
+};
+
+export default function Home({ todos }: AppProps) {
   return (
     <main>
-      <TodosList />
+      {todos.map((todo) => (
+        <div key={todo._id}>
+          <h3>{todo.title}</h3>
+          <p>{todo.description}</p>
+          <p>Complete: {todo.isComplete ? "Yes" : "No"}</p>
+        </div>
+      ))}
     </main>
   );
 }
@@ -20,7 +37,6 @@ export async function getStaticProps() {
     isComplete,
   }`;
   const data = await client.fetch(query);
-  console.log(data);
   return {
     props: {
       todos: data,
