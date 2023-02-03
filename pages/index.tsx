@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { groq } from "next-sanity";
-
-import TodosList from "../components/TodosList";
+import TodoItem from "../components/TodoItem";
 import client from "../utils/sanityClient";
 
 type Todo = {
@@ -11,35 +10,33 @@ type Todo = {
   isComplete: boolean;
 };
 
-type AppProps = {
-  todos: Todo[];
-};
-
-export default function Home({ todos }: AppProps) {
-  return (
-    <main>
-      {todos.map((todo) => (
-        <div key={todo._id}>
-          <h3>{todo.title}</h3>
-          <p>{todo.description}</p>
-          <p>Complete: {todo.isComplete ? "Yes" : "No"}</p>
-        </div>
-      ))}
-    </main>
-  );
-}
-
-export async function getStaticProps() {
+const fetchTodos = () => {
   const query = groq`*[_type == "todo"]{
     _id,
     title,
     description,
     isComplete,
   }`;
-  const data = await client.fetch(query);
-  return {
-    props: {
-      todos: data,
-    },
-  };
+
+  return client.fetch(query);
+};
+
+export default function Home() {
+  const todosQuery = useQuery(["todos"], () => fetchTodos());
+
+  if (todosQuery.isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (todosQuery.isError) {
+    return <p>Error...</p>;
+  }
+
+  return (
+    <main>
+      {todosQuery.data.map((todo: Todo) => (
+        <TodoItem key={todo._id} {...todo} />
+      ))}
+    </main>
+  );
 }
